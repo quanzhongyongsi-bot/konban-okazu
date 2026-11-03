@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#E4572E">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="今晩のおかず">
-<title>今晩のおかず</title>
+<meta name="apple-mobile-web-app-title" content="パパッとCook">
+<title>パパッとCook</title>
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -261,7 +261,7 @@ nav.tabbar button.on{color:var(--acc);}
 </head>
 <body>
 <header>
-  <div class="ttl">🍳 今晩の<span class="em">おかず</span></div>
+  <div class="ttl">🍳 パパッと<span class="em">Cook</span></div>
   <div class="sub">持っている食材から、今夜の一品を決めるお手伝い</div>
 </header>
 <main>
@@ -504,7 +504,7 @@ nav.tabbar button.on{color:var(--acc);}
       <div class="note">冷蔵庫の登録、選択した食材、保存したレシピ、作った履歴、食事の記録を、すべて消して最初の状態に戻します。</div>
       <div style="margin-top:10px;"><button class="subbtn" id="resetBtn">データを初期化する</button></div>
     </div>
-    <div class="note" style="text-align:center; margin-top:8px;">今晩のおかず（試作版 Phase 1.9）</div>
+    <div class="note" style="text-align:center; margin-top:8px;">パパッとCook（試作版 Phase 1.9）</div>
   </section>
 </main>
 
@@ -5422,7 +5422,7 @@ function boot(){
   document.getElementById("requestCopyBtn").onclick = function(){
     var v = document.getElementById("requestInput").value.trim();
     if(!v){ toast("アイデアが書かれていません"); return; }
-    copyText("【今晩のおかずへのアイデア】\n" + v, "アイデアをコピーしました。メールやSNSに貼って送ってください");
+    copyText("【パパッとCookへのアイデア】\n" + v, "アイデアをコピーしました。メールやSNSに貼って送ってください");
   };
   document.getElementById("detailBack").onclick = function(){
     viewStack.pop();

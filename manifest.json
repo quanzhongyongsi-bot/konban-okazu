@@ -1,6 +1,6 @@
 {
-  "name": "今晩のおかず",
-  "short_name": "おかず",
+  "name": "パパッとCook",
+  "short_name": "パパッとCook",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",

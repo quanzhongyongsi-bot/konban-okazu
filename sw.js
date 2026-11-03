@@ -1,5 +1,5 @@
-// 今晩のおかず サービスワーカー（最小構成）: オフラインでもアプリを開けるようにする
-const CACHE = 'okazu-v12';
+// パパッとCook サービスワーカー（最小構成）: オフラインでもアプリを開けるようにする
+const CACHE = 'okazu-v13';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
