@@ -1,6 +1,6 @@
 // パパッとCook サービスワーカー: オフラインでもアプリを開けるようにする
 // 更新の反映は「次にアプリを開いたとき」。使用中の画面を途中で切り替えない（Phase 1.13）
-const CACHE = 'okazu-v29';
+const CACHE = 'okazu-v30';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   // skipWaiting はしない: 開いている画面がある間は新しいワーカーを待機させ、
