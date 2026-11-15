@@ -344,6 +344,23 @@ body.panelBeige #mascotBubble::after{ background:#FFF3D6; }
       </div>
     </div>
 
+    <h2 class="sec">🍳 作りたい料理</h2>
+    <div class="card">
+      <div class="inputRow">
+        <input class="txtin" id="wantInput" type="text" placeholder="作りたい料理名を入力（例：肉じゃが、親子丼）">
+        <button class="micbtn" id="wantMicBtn" title="音声で入力">🎤</button>
+        <button class="addbtn" id="wantAddBtn">追加</button>
+      </div>
+      <div class="voiceGuide" id="wantVoiceGuide" hidden>
+        <button type="button" class="vgClose" aria-label="閉じる">✕</button>
+        <div class="vgT">🎤 この画面では直接の音声入力ができません</div>
+        <p>入力欄をタップして、キーボードの🎤（マイク）ボタンで話すと、そのまま文字が入ります。下のボタンを押すと入力欄へ移動します。</p>
+        <button type="button" class="vgBtn">入力欄へ移動する</button>
+      </div>
+      <div class="note">作りたい料理を入れておくと、ここに一覧で並びます。「、」で区切ると、まとめて追加できます。アプリ内にレシピがある料理は、タップで開けます。</div>
+      <div id="wantListBox"></div>
+    </div>
+
     <h2 class="sec">🌾 季節のおすすめ</h2>
     <div id="heroBox"></div>
 
@@ -3876,7 +3893,7 @@ var RECIPES = [
 var LS_KEY = "konbanOkazuV1";
 function freshState(){
   return { fridge:[], fridgeQty:{}, fridgeIn:[], fridgeInQty:{}, unitV2:false, unitV3:false, selected:[], genre:"指定なし", sweetCat:"指定なし",
-    customAll:[], saved:[], history:[], meals:{},
+    customAll:[], wantList:[], saved:[], history:[], meals:{},
     menu:null, shop:null, tman:{}, storiesRead:[], wazaPinStorage:[], wazaPinTricks:[], bgChoice:"page", panelStyle:"glass", chara:{ last:"", rareDay:"", rareHit:false, rareCount:0, celeb:{} } };
 }
 var state = freshState();
@@ -3894,6 +3911,7 @@ function loadState(){
       if(typeof s.genre==="string") state.genre = s.genre;
       if(typeof s.sweetCat==="string") state.sweetCat = s.sweetCat;
       if(Array.isArray(s.customAll)) state.customAll = s.customAll.filter(function(x){ return typeof x==="string"; });
+      if(Array.isArray(s.wantList)) state.wantList = s.wantList.filter(function(x){ return typeof x==="string"; });
       if(Array.isArray(s.saved)) state.saved = s.saved.filter(function(x){ return x && typeof x.n==="string"; });
       if(Array.isArray(s.history)) state.history = s.history.filter(function(x){ return x && typeof x.n==="string" && typeof x.d==="string"; });
       if(s.meals && typeof s.meals==="object" && !Array.isArray(s.meals)) state.meals = s.meals;
@@ -5326,7 +5344,56 @@ function renderWaza(){
     list.appendChild(d);
   });
 }
+/* ===== 作りたい料理リスト ===== */
+function findWantRecipe(name){
+  var hit = null;
+  RECIPES.forEach(function(r){ if(!hit && r.n === name) hit = r; });
+  if(hit) return hit;
+  RECIPES.forEach(function(r){ if(!hit && (r.n.indexOf(name) >= 0 || name.indexOf(r.n) >= 0)) hit = r; });
+  return hit;
+}
+function renderWantList(){
+  var box = document.getElementById("wantListBox");
+  if(!box) return;
+  box.innerHTML = "";
+  if(!state.wantList.length){
+    box.innerHTML = '<div class="note">まだ登録がありません。作りたい料理を入れてみてください。</div>';
+    return;
+  }
+  state.wantList.forEach(function(name){
+    var row = document.createElement("div");
+    row.className = "rcard";
+    var r = findWantRecipe(name);
+    var inner = '<div class="name">' + esc(name) + '</div>';
+    if(r) inner += '<div class="cm">アプリ内にレシピがあります。タップで開きます ›</div>';
+    inner += '<div class="cardBtns"><button class="miniBtn wantDel">✕ 削除</button></div>';
+    row.innerHTML = inner;
+    if(r){
+      row.onclick = function(){ openDetail(r, state.selected.slice(), "home"); };
+    }
+    var db = row.querySelector(".wantDel");
+    db.onclick = function(ev){
+      ev.stopPropagation();
+      var i = state.wantList.indexOf(name);
+      if(i >= 0) state.wantList.splice(i, 1);
+      saveState(); renderWantList();
+    };
+    box.appendChild(row);
+  });
+}
+function addWantText(text){
+  var parts = String(text || "").split(/[、,]/);
+  var added = 0;
+  parts.forEach(function(p){
+    var t = p.trim();
+    if(t && state.wantList.indexOf(t) < 0){ state.wantList.push(t); added++; }
+  });
+  if(added){ saveState(); renderWantList(); }
+  return added;
+}
+
 function renderHome(){
+  renderWantList();
   renderChara();
   renderHero();
   renderBest();
@@ -6359,6 +6426,14 @@ function boot(){
   document.getElementById("ingInput").addEventListener("keydown", function(ev){
     if(ev.key === "Enter"){ ev.preventDefault(); document.getElementById("ingAddBtn").click(); }
   });
+  document.getElementById("wantAddBtn").onclick = function(){
+    var inp = document.getElementById("wantInput");
+    if(!addWantText(inp.value)){ toast("料理名を入力してください"); return; }
+    inp.value = "";
+  };
+  document.getElementById("wantInput").addEventListener("keydown", function(ev){
+    if(ev.key === "Enter"){ ev.preventDefault(); document.getElementById("wantAddBtn").click(); }
+  });
   document.getElementById("fridgeAddBtn").onclick = function(){
     var inp = document.getElementById("fridgeInput");
     addIngText(inp.value, "fridge");
@@ -6367,6 +6442,7 @@ function boot(){
   document.getElementById("fridgeInput").addEventListener("keydown", function(ev){
     if(ev.key === "Enter"){ ev.preventDefault(); document.getElementById("fridgeAddBtn").click(); }
   });
+  setupVoice("wantMicBtn", "wantInput", "wantVoiceGuide");
   setupVoice("ingMicBtn", "ingInput", "ingVoiceGuide");
   setupVoice("fridgeMicBtn", "fridgeInput", "fridgeVoiceGuide");
   var mealInput = document.getElementById("mealInput");
@@ -6509,7 +6585,7 @@ function boot(){
       toast("データを初期化しました");
     });
   };
-  ["mealInput","fridgeInput","ingInput","storageInput","tipInput"].forEach(function(id){
+  ["mealInput","fridgeInput","ingInput","wantInput","storageInput","tipInput"].forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.addEventListener("input", function(){ noteDraft(id, el.value); });
   });
