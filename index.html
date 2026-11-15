@@ -624,9 +624,11 @@ body.panelBeige #mascotBubble::after{ background:#FFF3D6; }
       <div style="margin-top:10px;"><button class="subbtn" id="resetBtn">データを初期化する</button></div>
     </div>
     <div class="card">
-      <div style="font-weight:800; font-size:17px; margin-bottom:6px;">🖼 背景の景色</div>
-      <div class="note" style="margin-bottom:10px;">アプリの背景に、外の景色を表示できます。「景色（実写）」「デザイン（模様）」の全17種類から、ページごとに変わる設定や、日替わり、お好きな1枚への固定が選べます。ルルシェとホッピィはページごとに違う姿勢・表情で、いつも画面の左下にいます（背景を変えても、キャラは変わりません）。</div>
-      <div id="bgChoiceBox"></div>
+      <div id="bgHead" style="font-weight:800; font-size:17px; margin-bottom:6px; cursor:pointer;">🖼 背景の景色 <span id="bgNowName" style="font-weight:600; font-size:13px; color:#b06a3b;"></span> <span id="bgToggleMark" style="float:right; font-size:13px; color:#b06a3b;">▸ 開く</span></div>
+      <div id="bgBody" hidden>
+        <div class="note" style="margin-bottom:10px;">アプリの背景に、外の景色を表示できます。「景色（実写）」「デザイン（模様）」から、ページごとに変わる設定や、日替わり、お好きな1枚への固定が選べます。ルルシェとホッピィはページごとに違う姿勢・表情で、いつも画面の左下にいます（背景を変えても、キャラは変わりません）。背景は定期的に見直し、あまり使われていないものは整理することがあります。</div>
+        <div id="bgChoiceBox" style="max-height:46vh; overflow-y:auto; -webkit-overflow-scrolling:touch;"></div>
+      </div>
     </div>
     <div class="card">
       <div style="font-weight:800; font-size:17px; margin-bottom:6px;">🔤 字幕（文字の枠）の背景</div>
@@ -4797,6 +4799,21 @@ function renderPanelStyles(){
   box.appendChild(panelStyleRow("glass", "半透明（今まで通り）", "今の見た目です。後ろの景色が少し透けて見えます", prevGlass));
   box.appendChild(panelStyleRow("beige", "ベージュ（透けない）", "元の見た目です。透けないので、文字が読みやすくなります", prevBeige));
 }
+var bgOpen = false;
+function bgNameOf(key){
+  var nm = "";
+  BG_CHOICES.forEach(function(c){ if(c[0]===key) nm = c[1]; });
+  if(!nm) BG_GROUPS.forEach(function(g){ g[1].forEach(function(it){ if(it[0]===key) nm = it[1]; }); });
+  return nm || key;
+}
+function renderBgToggle(){
+  var body = document.getElementById("bgBody");
+  var mark = document.getElementById("bgToggleMark");
+  var now = document.getElementById("bgNowName");
+  if(body) body.hidden = !bgOpen;
+  if(mark) mark.textContent = bgOpen ? "▾ 閉じる" : "▸ 開く";
+  if(now) now.textContent = "（いま：" + bgNameOf(state.bgChoice) + "）";
+}
 function renderBgChoices(){
   var box = document.getElementById("bgChoiceBox");
   if(!box) return;
@@ -4809,6 +4826,7 @@ function renderBgChoices(){
     box.appendChild(h);
     g[1].forEach(function(it){ box.appendChild(bgChoiceRow(it[0], it[1], "", BG_FILES[it[0]])); });
   });
+  renderBgToggle();
 }
 
 /* ===== 小話：今日の1本＋アーカイブ ===== */
@@ -6478,6 +6496,8 @@ function boot(){
   document.getElementById("fridgeInput").addEventListener("keydown", function(ev){
     if(ev.key === "Enter"){ ev.preventDefault(); document.getElementById("fridgeAddBtn").click(); }
   });
+  var bgHeadEl = document.getElementById("bgHead");
+  if(bgHeadEl) bgHeadEl.onclick = function(){ bgOpen = !bgOpen; renderBgToggle(); };
   setupVoice("wantMicBtn", "wantInput", "wantVoiceGuide");
   setupVoice("ingMicBtn", "ingInput", "ingVoiceGuide");
   setupVoice("fridgeMicBtn", "fridgeInput", "fridgeVoiceGuide");
