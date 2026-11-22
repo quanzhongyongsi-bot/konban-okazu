@@ -5272,6 +5272,7 @@ var STORAGE_CATS = [
 function storageFind(q){
   q = String(q || "").trim();
   if(!q) return null;
+  var zj = zhToJaName(q); if(zj) q = zj;
   var c = canonIngredient(q) || q;
   var names = [q, c];
   for(var i = 0; i < STORAGE.length; i++){
@@ -5361,6 +5362,7 @@ var ING_TIPS = [
 function tipFind(q){
   q = String(q || "").trim();
   if(!q) return null;
+  var zj = zhToJaName(q); if(zj) q = zj;
   var c = canonIngredient(q) || q;
   var ing = null;
   for(var i = 0; i < ING_TIPS.length; i++){
@@ -6170,9 +6172,15 @@ var ALIASES = {
   "ニンニク":"にんにく","ショウガ":"しょうが","生姜":"しょうが",
   "ごま":"白ごま","ゴマ":"白ごま","白ゴマ":"白ごま","とうがらし":"唐辛子"
 };
+/* 繁體中文の食材名 → 日本語の食材名（言語切替ブロックの逆引き辞書を利用。日本語モードでも別名として働く） */
+function zhToJaName(s){
+  try{ if(window.PAPATTO_I18N && PAPATTO_I18N.toJa) return PAPATTO_I18N.toJa(s); }catch(e){}
+  return null;
+}
 function canonIngredient(raw){
   var s = String(raw).replace(/\s+/g, "").trim();
   if(!s) return null;
+  var zj = zhToJaName(s); if(zj) s = zj;
   if(CHIP_ALL.indexOf(s) >= 0) return s;
   if(ALIASES[s]) return ALIASES[s];
   return null;
@@ -6186,8 +6194,8 @@ function addIngText(text, target){
   var added = [];
   words.forEach(function(w){
     var c = canonIngredient(w);
-    var name = c || w;
-    if(!c && state.customAll.indexOf(w) < 0) state.customAll.push(w);
+    var name = c || zhToJaName(w) || w;
+    if(!c && state.customAll.indexOf(name) < 0) state.customAll.push(name);
     if(target === "fridge"){
       if(state.fridgeIn.indexOf(name) < 0){ inSetQty(name, defQty(name)); added.push(name); }
     } else {
@@ -6907,7 +6915,7 @@ var ZH = {
   "パパッとCook（試作版 Phase 1.22）":"パパッとCook（試用版 Phase 1.22）",
   "やめる":"取消",
   "冷蔵庫の登録、選択した食材、保存したレシピ、作った履歴、食事の記録をすべて消します。よろしいですか？":"將刪除冰箱登記、已選食材、儲存的食譜、做過的紀錄與飲食記錄。確定要繼續嗎？",
-  "アプリの表示言語を選べます。レシピの内容（料理名・材料など）は日本語のまま表示されます。":"可以選擇 App 的顯示語言。食譜內容（料理名稱・食材等）仍以日文顯示。",
+  "アプリの表示言語を選べます。レシピの内容（料理名・材料など）は日本語のまま表示されます。":"可以選擇 App 的顯示語言。食材名稱會以中文顯示，料理名稱與作法等食譜內容仍以日文顯示。",
   /* タブ */
   "レシピ":"食譜","冷蔵庫":"冰箱","保存した料理":"儲存的料理","小話・記録":"小故事・記錄",
   /* 動的UI：チップ・グループ・カテゴリ */
@@ -6922,6 +6930,7 @@ var ZH = {
   "常備品":"常備調味料","ある ✓":"有 ✓","足りない":"不足","分量：2人分":"份量：2 人份",
   "栄養の目安（1人分）":"營養參考（每人份）","材料":"食材","作り方":"作法",
   "🔀 アレンジのアイデア":"🔀 變化靈感","🥬 材料":"🥬 食材",
+  "いつもの味に飽きたら、材料や仕上げを少し変えるだけで、別の楽しみ方ができます。":"吃膩了平常的味道時，只要稍微改變食材或收尾方式，就能有不同的享受方式。",
   "冷蔵庫の食材で作れます":"用冰箱的食材就能做",
   "買い物リストをコピー":"複製購物清單","🛒 買い物チェックを開く":"🛒 開啟購物清單","🛒 買い足しはありません":"🛒 沒有需要另外購買的食材",
   "🍳 作った":"🍳 做過了","🍽 今日の献立にする":"🍽 設為今日菜單","👩‍🍳 調理モードで作る":"👩‍🍳 用烹飪模式製作",
@@ -6931,6 +6940,9 @@ var ZH = {
   /* 裏技・保存 */
   "📌 ピン留め中（タップで外す）":"📌 已釘選（點一下取消）","📌 ピン留めする":"📌 釘選","📌 保存法をピン留めする":"📌 釘選這個保存法",
   "食材名を入力してください。":"請輸入食材名稱。",
+  "保存場所：":"保存地點：","目安：":"保存期限：",
+  "この食材専用のデータがまだ無いため、分類からの推定（目安）です。":"這個食材尚無專用資料，這是依分類推估的參考。",
+  "葉物野菜":"葉菜類","根菜":"根莖類","果物":"水果","ハーブ・香味野菜":"香草・香辛蔬菜","いも・玉ねぎ（常温）":"薯類・洋蔥（常溫）",
   /* 冷蔵庫・保存・記録の空状態 */
   "まだ何も入っていません。上の「食材を入れる」で選んで、「保存する」を押すとここに入ります。":"尚無任何食材。在上方「加入食材」選擇後，按「儲存」即可放入這裡。",
   "まだありません。上の入力欄か下のチップで選んでください。":"尚無項目。請在上方輸入欄或下方標籤選擇。",
@@ -7056,6 +7068,61 @@ var ZH = {
 };
 Object.keys(WORDS).forEach(function(k){ if(!Object.prototype.hasOwnProperty.call(ZH, k)) ZH[k] = WORDS[k]; });
 
+/* 食材名辞書（日本語 → 繁體中文・台湾の言い方）。
+   対象は食材ボキャブラリ全量（選択チップ＋全レシピの材料＋保存法・裏技・各種マップの和集合）。 */
+var ZH_ING = {
+  "鶏肉":"雞肉","豚肉":"豬肉","牛肉":"牛肉","ひき肉":"絞肉","卵":"蛋","ベーコン":"培根","ウインナー":"香腸",
+  "鮭":"鮭魚","さば":"鯖魚","エビ":"蝦","えび":"蝦","いか":"魷魚","ハム":"火腿","ソーセージ":"香腸",
+  "あじ":"竹筴魚","いわし":"沙丁魚","たら":"鱈魚","ぶり":"鰤魚","まぐろ":"鮪魚","かつお":"鰹魚","たこ":"章魚",
+  "あさり":"蛤蜊","しじみ":"蜆","貝":"貝類","魚":"魚","肉":"肉","ツナ缶":"鮪魚罐頭","ちくわ":"竹輪",
+  "じゃがいも":"馬鈴薯","玉ねぎ":"洋蔥","にんじん":"紅蘿蔔","キャベツ":"高麗菜","白菜":"大白菜","きのこ":"菇類",
+  "なす":"茄子","ピーマン":"青椒","トマト":"番茄","大根":"白蘿蔔","ほうれん草":"菠菜","もやし":"豆芽菜",
+  "ニラ":"韭菜","長ねぎ":"青蔥","ねぎ":"蔥","ごぼう":"牛蒡","里芋":"小芋頭","かぼちゃ":"南瓜",
+  "レタス":"萵苣","小松菜":"小松菜","ブロッコリー":"青花菜","きゅうり":"小黃瓜","れんこん":"蓮藕",
+  "さつまいも":"地瓜","さつま":"地瓜","水菜":"水菜","春菊":"茼蒿","チンゲン":"青江菜","サラダ菜":"奶油萵苣",
+  "大葉":"紫蘇葉","しそ":"紫蘇","かぶ":"蕪菁","山芋":"山藥","長芋":"山藥","唐辛子":"辣椒",
+  "にんにく":"大蒜","しょうが":"薑","レモン":"檸檬","ゆず":"柚子","みょうが":"茗荷","セロリ":"西洋芹",
+  "パクチー":"香菜","バジル":"羅勒","パセリ":"巴西里",
+  "しめじ":"鴻喜菇","えのき":"金針菇","しいたけ":"香菇","舞茸":"舞菇","エリンギ":"杏鮑菇","マッシュルーム":"洋菇","なめこ":"滑菇",
+  "豆腐":"豆腐","絹ごし豆腐":"嫩豆腐","豆乳":"豆漿","納豆":"納豆","油揚げ":"油豆腐","厚揚げ":"厚油豆腐",
+  "牛乳":"牛奶","チーズ":"起司","バター":"奶油","生クリーム":"鮮奶油","ヨーグルト":"優格","プレーンヨーグルト":"原味優格",
+  "スライスチーズ":"起司片","粉チーズ":"起司粉","卵黄":"蛋黃",
+  "塩":"鹽","こしょう":"胡椒","胡椒":"胡椒","醤油":"醬油","しょうゆ":"醬油","味噌":"味噌","砂糖":"糖",
+  "酒":"米酒","みりん":"味醂","サラダ油":"沙拉油","ごま油":"麻油","だしの素":"日式高湯粉","酢":"醋","片栗粉":"太白粉",
+  "小麦粉":"麵粉","薄力粉":"低筋麵粉","米粉":"米粉","パン粉":"麵包粉","白玉粉":"白玉粉","粉寒天":"寒天粉","ゼラチン":"吉利丁",
+  "白ごま":"白芝麻","黒ごま":"黑芝麻","すりごま":"芝麻粉","練り黒ごま":"黑芝麻醬","きな粉":"黃豆粉",
+  "抹茶パウダー":"抹茶粉","ココアパウダー":"可可粉","シナモン":"肉桂粉","カレー粉":"咖哩粉",
+  "豆板醤":"豆瓣醬","甜麺醤":"甜麵醬","オイスターソース":"蠔油","ナンプラー":"魚露","ケチャップ":"番茄醬",
+  "中濃ソース":"中濃醬","ウスターソース":"伍斯特醬","ソース":"醬汁","ポン酢":"柚子醋","コンソメ":"西式高湯粉",
+  "鶏ガらスープの素":"雞湯粉","鶏がらスープの素":"雞湯粉","ココナッツミルク":"椰奶","オリーブオイル":"橄欖油",
+  "レモン汁":"檸檬汁","マヨネーズ":"美乃滋","めんつゆ":"日式麵湯露","焼肉のタレ":"燒肉醬",
+  "梅干し":"梅乾","かつお節":"柴魚片","乾燥わかめ":"乾燥海帶芽","わかめ":"海帶芽","青のり":"青海苔粉","焼きのり":"海苔片",
+  "乾燥ひじき":"乾燥羊栖菜","ひじき":"羊栖菜","切り干し大根":"蘿蔔乾","はちみつ":"蜂蜜","黒みつ":"黑糖蜜",
+  "春雨":"冬粉","パスタ":"義大利麵","ごはん":"白飯","ご飯":"白飯","食パン":"吐司","切り餅":"切塊麻糬","もち米":"糯米",
+  "キムチ":"泡菜","水":"水","コーヒー":"咖啡","バニラエッセンス":"香草精",
+  "りんご":"蘋果","バナナ":"香蕉","みかん":"橘子","いちご":"草莓","柿":"柿子","ぶどう":"葡萄","梨":"梨子",
+  "桃":"桃子","メロン":"哈密瓜","キウイ":"奇異果","すいか":"西瓜","パイナップル":"鳳梨",
+  "フルーツ缶詰":"水果罐頭","甘栗":"甘栗","ゆであずき缶":"紅豆罐頭","こしあん":"紅豆餡","かぼちゃの種":"南瓜子",
+  "市販スポンジケーキ":"市售海綿蛋糕","板チョコ":"片裝巧克力","チョコチップ":"巧克力豆","チョコパイ":"巧克力派",
+  "アラザン":"銀色糖珠","コーンフレーク":"玉米片","おからパウダー":"豆渣粉","ベーキングパウダー":"泡打粉",
+  "ホットケーキミックス":"鬆餅粉","甘酒":"甘酒"
+};
+Object.keys(ZH_ING).forEach(function(k){ if(!Object.prototype.hasOwnProperty.call(ZH, k)) ZH[k] = ZH_ING[k]; });
+function trIng(name){ return Object.prototype.hasOwnProperty.call(ZH_ING, name) ? ZH_ING[name] : name; }
+function trIngList(str, sep){ return String(str).split(sep).map(trIng).join(sep); }
+/* 逆引き辞書（繁體中文 → 日本語）。値が衝突する場合はチップ食材（利用者が選ぶ食材）を優先する */
+var ZH_ING_REV = {};
+Object.keys(ZH_ING).forEach(function(k){ var v = ZH_ING[k]; if(!Object.prototype.hasOwnProperty.call(ZH_ING_REV, v)) ZH_ING_REV[v] = k; });
+try{ CHIP_GROUPS.forEach(function(g){ g.items.forEach(function(it){ if(ZH_ING[it]) ZH_ING_REV[ZH_ING[it]] = it; }); }); }catch(e){}
+/* 逆引き専用の別名（利用者が入力しそうな言い方） */
+var ZH_ING_REV_EXTRA = { "雞蛋":"卵", "蒜頭":"にんにく", "番薯":"さつまいも", "蕃薯":"さつまいも", "生菜":"レタス" };
+Object.keys(ZH_ING_REV_EXTRA).forEach(function(k){ ZH_ING_REV[k] = ZH_ING_REV_EXTRA[k]; });
+function zhToJa(text){
+  var s = String(text == null ? "" : text).replace(/\s+/g, "").trim();
+  if(!s) return null;
+  return Object.prototype.hasOwnProperty.call(ZH_ING_REV, s) ? ZH_ING_REV[s] : null;
+}
+
 /* プレースホルダ・title・aria-label の辞書 */
 var ZH_ATTR = {
   "食材名を入力（例：たまねぎ、卵）":"輸入食材名稱（例：洋蔥、雞蛋）",
@@ -7081,7 +7148,7 @@ function trComposite(core){
   if(m = core.match(/^足りない食材 (\d+) 点（冷蔵庫基準）$/)) return "還缺 " + m[1] + " 樣食材（依冰箱庫存）";
   if(m = core.match(/^足りない食材 (\d+) 点$/)) return "還缺 " + m[1] + " 樣食材";
   if(m = core.match(/^🛒 買い物リスト（足りない食材 (\d+) 点）$/)) return "🛒 購物清單（還缺 " + m[1] + " 樣食材）";
-  if(m = core.match(/^主な食材：/)) return core.replace(/^主な食材：/, "主要食材：");
+  if(m = core.match(/^主な食材：(.+)$/)) return "主要食材：" + trIngList(m[1], "・");
   if(m = core.match(/^材料(\d+)種類・(\d+)分$/)) return m[1] + " 種食材・" + m[2] + " 分鐘";
   if(m = core.match(/^(春|夏|秋|冬)のおすすめ$/)) return m[1] + "季推薦";
   if(m = core.match(/^🍂 (春|夏|秋|冬)のおすすめ$/)) return "🍂 " + m[1] + "季推薦";
@@ -7091,7 +7158,7 @@ function trComposite(core){
   if(m = core.match(/^(春|夏|秋|冬)の料理・(\d+)品$/)) return m[1] + "季料理・" + m[2] + " 道";
   if(m = core.match(/^15分以内・(\d+)品$/)) return "15 分鐘內・" + m[1] + " 道";
   if(m = core.match(/^冷めてもおいしい・(\d+)品$/)) return "冷了也好吃・" + m[1] + " 道";
-  if(m = core.match(/^冷蔵庫の中身：(\d+)品目（(.*)）$/)) return "冰箱內容：" + m[1] + " 樣（" + m[2] + "）";
+  if(m = core.match(/^冷蔵庫の中身：(\d+)品目（(.*)）$/)) return "冰箱內容：" + m[1] + " 樣（" + trIngList(m[2], "・") + "）";
   if(m = core.match(/^冷蔵庫の中身：(\d+)品目$/)) return "冰箱內容：" + m[1] + " 樣";
   if(m = core.match(/^🧊 冷蔵庫の中身を確認する（(\d+)品目）$/)) return "🧊 查看冰箱內容（" + m[1] + " 樣）";
   if(m = core.match(/^残り (\d+) 点（全部で (\d+) 点）$/)) return "還剩 " + m[1] + " 樣（共 " + m[2] + " 樣）";
@@ -7107,10 +7174,13 @@ function trComposite(core){
   if(m = core.match(/^🔥(.+?)(・目安)?$/)) return "🔥" + trWord(m[1]) + (m[2] ? "・參考" : "");
   if(m = core.match(/^💡 ポイント：/)) return core.replace(/^💡 ポイント：/, "💡 小提示：");
   if(m = core.match(/^今日の献立を「(.+)」にしました$/)) return "已將今日菜單設為「" + m[1] + "」";
-  if(m = core.match(/^(.+?) の保存法$/)) return m[1] + " 的保存法";
-  if(m = core.match(/^(.+?)を美味しくする裏技$/)) return "讓" + m[1] + "更好吃的小秘訣";
-  if(m = core.match(/^「(.+?)」の裏技は見つかりませんでした。下の一覧も見てみてください。$/)) return "找不到「" + m[1] + "」的小秘訣。請看看下方的一覽。";
-  if(m = core.match(/^「(.+?)」を冷蔵庫から消しました$/)) return "已從冰箱刪除「" + m[1] + "」";
+  if(m = core.match(/^(.+?) の保存法$/)) return trIng(m[1]) + " 的保存法";
+  if(m = core.match(/^💡 (.+?)を美味しくする裏技$/)) return "💡 讓" + trIng(m[1]) + "更好吃的小秘訣";
+  if(m = core.match(/^(.+?)を美味しくする裏技$/)) return "讓" + trIng(m[1]) + "更好吃的小秘訣";
+  if(m = core.match(/^「(.+?)」の裏技は見つかりませんでした。下の一覧も見てみてください。$/)) return "找不到「" + trIng(m[1]) + "」的小秘訣。請看看下方的一覽。";
+  if(m = core.match(/^「(.+?)」を冷蔵庫から消しました$/)) return "已從冰箱刪除「" + trIng(m[1]) + "」";
+  if(m = core.match(/^(.+?) からの目安$/)){ var catZh = Object.prototype.hasOwnProperty.call(ZH, m[1]) ? ZH[m[1]] : m[1]; return catZh + " 的參考"; }
+  if((m = core.match(/^(.+?) (.+)$/)) && Object.prototype.hasOwnProperty.call(ZH_ING, m[1]) && m[2].length <= 12 && !/[、。]/.test(m[2])) return trIng(m[1]) + "　" + m[2];
   if(m = core.match(/^「(.+?)」というレシピは見つかりませんでした。そのまま記録する場合は「＋ 記録する」を押してください。$/)) return "找不到「" + m[1] + "」這道食譜。若要直接記錄，請按「＋ 記錄」。";
   if(m = core.match(/^(.+) の記録$/)) return m[1] + " 的記錄";
   if(m = core.match(/^全(\d+)ページの読み物です$/)) return "共 " + m[1] + " 頁的讀物";
@@ -7124,13 +7194,13 @@ function trComposite(core){
     if(Object.prototype.hasOwnProperty.call(ZH, m[1])) return ZH[m[1]] + "（" + m[2] + "）";
     var wv = trWord(m[1]); if(wv !== m[1]) return wv + "（" + m[2] + "）";
   }
-  if(core.indexOf("追加しました：") === 0) return "已加入：" + core.slice("追加しました：".length);
-  if(core.indexOf("冷蔵庫に入れました：") === 0) return "已放入冰箱：" + core.slice("冷蔵庫に入れました：".length);
+  if(core.indexOf("追加しました：") === 0) return "已加入：" + trIngList(core.slice("追加しました：".length), "・");
+  if(core.indexOf("冷蔵庫に入れました：") === 0) return "已放入冰箱：" + trIngList(core.slice("冷蔵庫に入れました：".length), "・");
   /* 検索条件文（／区切り） */
   if(core.indexOf("／") >= 0 && (core.indexOf("選んだ食材：") >= 0 || /件$/.test(core) || core.indexOf("ジャンル：") >= 0)){
     var parts = core.split("／").map(function(seg){
       var mm;
-      if(mm = seg.match(/^選んだ食材：(.*)$/)) return "已選食材：" + (mm[1] === "なし" ? "無" : mm[1]);
+      if(mm = seg.match(/^選んだ食材：(.*)$/)) return "已選食材：" + (mm[1] === "なし" ? "無" : trIngList(mm[1], "・"));
       if(mm = seg.match(/^ジャンル：(.+)$/)) return "類型：" + trWord(mm[1]);
       if(mm = seg.match(/^カテゴリ：(.+)$/)) return "分類：" + trWord(mm[1]);
       if(mm = seg.match(/^(\d+)件$/)) return mm[1] + " 道";
@@ -7240,7 +7310,7 @@ function setLang(l){
   }
   updateLangBtns();
 }
-window.PAPATTO_I18N = { setLang: setLang, getLang: function(){ return cur; } };
+window.PAPATTO_I18N = { setLang: setLang, getLang: function(){ return cur; }, ingToZh: trIng, toJa: zhToJa };
 
 var jb = document.getElementById("langBtnJa"), zb = document.getElementById("langBtnZh");
 if(jb) jb.onclick = function(){ setLang("ja"); };
