@@ -376,11 +376,17 @@ body.panelBeige #mascotBubble::after{ background:#FFF3D6; }
     <h3 class="subsec">🍰 今日のおやつ</h3>
     <div id="oyatsuBox"></div>
     <div class="note">季節に合うスイーツの中から、日替わりで1品おすすめします。冷やす時間は作り方の中で案内しています。</div>
+    <h3 class="subsec">🍱 今日のお弁当</h3>
+    <div id="bentoBox"></div>
+    <div class="note">冷めてもおいしくて詰めやすい、お弁当向きのレシピの中から、日替わりで1品おすすめします。</div>
 
     <h2 class="sec">📌 コーナー</h2>
     <div class="cornerRow">
       <button class="cornerBtn" id="quickBtn">⏱ 時短レシピ<span class="cs" id="quickCount"></span></button>
       <button class="cornerBtn" id="seasonBtn">🍂 <span id="seasonName">今の季節</span><span class="cs" id="seasonCount"></span></button>
+    </div>
+    <div class="cornerRow" style="margin-top:10px;">
+      <button class="cornerBtn" id="bentoBtn">🍱 お弁当レシピ<span class="cs" id="bentoCount"></span></button>
     </div>
     <div class="cornerRow" style="margin-top:10px;">
       <button class="cornerBtn" id="wazaBtn">✨ 裏技・保存コーナー<span class="cs">美味しくする技と、食材の保存法</span></button>
@@ -661,7 +667,7 @@ body.panelBeige #mascotBubble::after{ background:#FFF3D6; }
 "use strict";
 /* ===== 定数 ===== */
 var STAPLES = ["塩","こしょう","醤油","味噌","砂糖","酒","みりん","サラダ油","ごま油","だしの素","酢","片栗粉"];
-var GENRES = ["指定なし","和食","中華","イタリアン","タイ","洋食","韓国","スイーツ"];
+var GENRES = ["指定なし","和食","中華","イタリアン","タイ","洋食","韓国","スイーツ","お弁当"];
 var CHIP_GROUPS = [
   {label:"肉・卵", items:["鶏肉","豚肉","牛肉","ひき肉","卵","ベーコン","ウインナー"]},
   {label:"魚介", items:["鮭","さば","エビ"]},
@@ -3889,7 +3895,65 @@ var RECIPES = [
 {n:"水切りヨーグルトの生チョコ風ケーキ",g:"スイーツ",s:"通年",t:10,lv:"かんたん",main:["ヨーグルト","板チョコ"],c:"水切りヨーグルトと板チョコで作る、冷やすだけのケーキです。",cat:"ヘルシー置き換え",
  ing:[["プレーンヨーグルト","400g"],["板チョコ","2枚（100g）"],["ココアパウダー","大さじ1"]],
  steps:["プレーンヨーグルトは、キッチンペーパーを敷いたざるで半日ほど水切りして約200gにする（冷やす時間は作業時間に含みません）。","板チョコは耐熱ボウルに入れ、電子レンジ（600W）で1分30秒加熱して溶かす。","水切りヨーグルトとよく混ぜる。","ラップを敷いた容器に詰め、冷蔵庫で3時間冷やしてココアパウダーをふる。"]}
+,
+/* ---------- お弁当（新規追加） ---------- */
+{n:"鮭おにぎり",g:"和食",s:"通年",t:15,lv:"かんたん",main:["鮭","ごはん"],c:"塩鮭をほぐして混ぜる、王道のお弁当おにぎりです。",bento:1,
+ ing:[["ごはん","2合分（約700g）"],["鮭","1切れ"],["塩","小さじ1/2"],["白ごま","大さじ1"],["焼きのり","4枚"]],
+ steps:["鮭はグリルかフライパンで焼いて皮と骨を取り、粗くほぐす。","温かいごはんに鮭、塩、白ごまを混ぜる。","手に水と塩（分量外）をつけ、4等分して三角に握る。","焼きのりを巻く。粗熱が取れてから詰めると傷みにくい。"]},
+{n:"ツナマヨおにぎり",g:"和食",s:"通年",t:10,lv:"かんたん",main:["ツナ缶","ごはん"],c:"子どもにも人気の定番。マヨのコクで冷めてもおいしい。",bento:1,
+ ing:[["ごはん","2合分（約700g）"],["ツナ缶","1缶"],["マヨネーズ","大さじ2"],["醤油","小さじ1"],["焼きのり","4枚"]],
+ steps:["ツナ缶は油をしっかり切り、マヨネーズと醤油を混ぜる。","ごはんを4等分し、真ん中にツナマヨを入れて三角に握る。","焼きのりを巻く。"]},
+{n:"梅とおかかのおにぎり",g:"和食",s:"通年",t:10,lv:"かんたん",main:["梅干し","ごはん"],c:"梅の酸味で傷みにくく、暑い日のお弁当にも安心です。",bento:1,
+ ing:[["ごはん","2合分（約700g）"],["梅干し","2個"],["かつお節","1パック（3g）"],["醤油","小さじ1"],["焼きのり","4枚"]],
+ steps:["梅干しは種を取り、包丁でたたいてペースト状にし、かつお節と醤油を混ぜる。","ごはんを4等分し、真ん中に入れて三角に握る。","焼きのりを巻く。"]},
+{n:"焼きおにぎり",g:"和食",s:"通年",t:15,lv:"かんたん",main:["ごはん"],c:"香ばしい醤油の焼き目が食欲をそそります。作り置きにも。",bento:1,
+ ing:[["ごはん","2合分（約700g）"],["醤油","大さじ2"],["みりん","大さじ1"],["ごま油","小さじ1"]],
+ steps:["ごはんを4等分し、少し固めに三角に握る。","フライパンにごま油を熱し、おにぎりを両面こんがり焼く。","醤油とみりんを混ぜて表面に塗り、香ばしく焼き上げる。"]},
+{n:"わかめごはんのおにぎり",g:"和食",s:"通年",t:10,lv:"かんたん",main:["わかめ","ごはん"],c:"給食の定番わかめごはんを、おにぎりで手軽に。",bento:1,
+ ing:[["ごはん","2合分（約700g）"],["乾燥わかめ","大さじ2"],["塩","小さじ1/2"],["白ごま","大さじ1"]],
+ steps:["乾燥わかめは水で戻して水気を絞り、細かく刻む。","温かいごはんにわかめ、塩、白ごまを混ぜる。","4等分して三角に握る。"]},
+{n:"甘い卵焼き",g:"和食",s:"通年",t:10,lv:"かんたん",main:["卵"],c:"ほんのり甘い関東風。お弁当の彩りの主役です。",bento:1,
+ ing:[["卵","3個"],["砂糖","大さじ1"],["塩","少々"],["サラダ油","小さじ1"]],
+ steps:["卵に砂糖と塩を加え、菜箸で切るように溶く。","卵焼き器に油を熱し、卵液を3回に分けて流し、巻きながら焼く。","巻きすやラップで形を整え、粗熱が取れてから切る。しっかり火を通すのがお弁当のコツ。"]},
+{n:"ねぎ入り卵焼き",g:"和食",s:"通年",t:10,lv:"かんたん",main:["卵","長ねぎ"],c:"ねぎの香りとだし醤油味で、冷めてもおいしい卵焼きです。",bento:1,
+ ing:[["卵","3個"],["長ねぎ","1/2本"],["醤油","小さじ1"],["砂糖","小さじ1"],["サラダ油","小さじ1"]],
+ steps:["長ねぎは小口切りにする。卵に醤油、砂糖、ねぎを加えて溶く。","卵焼き器に油を熱し、卵液を3回に分けて流し、巻きながら焼く。","粗熱が取れてから切り分ける。"]},
+{n:"チーズ卵焼き",g:"和食",s:"通年",t:10,lv:"かんたん",main:["卵","チーズ"],c:"真ん中のチーズがとろける、子どもの好きな卵焼きです。",bento:1,
+ ing:[["卵","3個"],["スライスチーズ","1枚"],["牛乳","大さじ1"],["塩","少々"],["サラダ油","小さじ1"]],
+ steps:["卵に牛乳と塩を加えて溶く。","卵焼き器に油を熱し、卵液の半量を流して半熟になったらチーズをのせて巻く。","残りの卵液を流して巻き重ね、形を整える。粗熱が取れてから切る。"]},
+{n:"鶏の唐揚げ",g:"和食",s:"通年",t:25,lv:"ふつう",main:["鶏肉"],c:"醤油としょうがの下味がしっかり。冷めてもおいしい王道です。",bento:1,
+ ing:[["鶏肉","300g"],["醤油","大さじ2"],["酒","大さじ1"],["しょうが","1かけ"],["にんにく","1かけ"],["片栗粉","大さじ4"],["サラダ油","適量"]],
+ steps:["鶏肉は一口大に切り、醤油、酒、すりおろしたしょうがとにんにくをもみ込んで15分おく。","片栗粉をまぶし、180℃の油で4分ほど揚げる。","一度取り出して3分休ませ、もう一度1分揚げるとカラッと仕上がる。油をよく切ってから詰める。"]},
+{n:"ちくわの磯辺揚げ風",g:"和食",s:"通年",t:10,lv:"かんたん",main:["ちくわ"],c:"青のりの香りが立つ、お弁当のすき間おかずの定番です。",bento:1,
+ ing:[["ちくわ","4本"],["小麦粉","大さじ3"],["青のり","小さじ2"],["水","大さじ3"],["サラダ油","大さじ2"]],
+ steps:["ちくわは斜め半分に切る。","小麦粉、青のり、水を混ぜて衣を作り、ちくわにからめる。","フライパンに油を熱し、両面こんがり焼く。"]},
+{n:"ほうれん草のごま和え",g:"和食",s:"通年",t:10,lv:"かんたん",main:["ほうれん草"],c:"ごまの風味で野菜が進む、彩りよい作り置きおかずです。",bento:1,
+ ing:[["ほうれん草","1束"],["白ごま","大さじ2"],["砂糖","小さじ2"],["醤油","小さじ2"]],
+ steps:["ほうれん草は茹でて水に取り、水気をしっかり絞って4cm長さに切る。","すりごま、砂糖、醤油を混ぜ、ほうれん草を和える。詰める前に水気が出ていたら軽く絞る。"]},
+{n:"にんじんしりしり",g:"和食",s:"通年",t:10,lv:"かんたん",main:["にんじん","ツナ缶"],c:"沖縄の家庭料理。ツナと卵で栄養満点の彩りおかずです。",bento:1,
+ ing:[["にんじん","2本"],["ツナ缶","1缶"],["卵","1個"],["醤油","小さじ2"],["ごま油","小さじ2"],["塩","少々"]],
+ steps:["にんじんは細切りにする。","フライパンにごま油を熱し、にんじんをしんなりするまで炒める。","油を切ったツナと醤油、塩を加え、溶き卵を回し入れて炒め合わせる。"]},
+{n:"さつまいものレモン煮",g:"和食",s:"秋",t:20,lv:"かんたん",main:["さつまいも"],c:"さっぱり甘い秋の作り置き。お弁当の箸休めにぴったりです。",bento:1,
+ ing:[["さつまいも","1本"],["レモン汁","大さじ1"],["砂糖","大さじ2"],["塩","少々"]],
+ steps:["さつまいもは1.5cmの輪切りにし、水にさらす。","鍋にさつまいも、ひたひたの水、砂糖、塩を入れて15分ほど煮る。","仕上げにレモン汁を加え、煮汁が少なくなるまで煮る。"]},
+{n:"ひじきの煮物",g:"和食",s:"通年",t:25,lv:"かんたん",main:["ひじき","にんじん"],c:"鉄分たっぷりの作り置きの王様。冷凍もできて便利です。",bento:1,
+ ing:[["乾燥ひじき","20g"],["にんじん","1/3本"],["油揚げ","1枚"],["醤油","大さじ2"],["みりん","大さじ1"],["砂糖","大さじ1"],["だしの素","小さじ1"],["サラダ油","小さじ1"]],
+ steps:["ひじきは水で戻して洗い、水気を切る。にんじんは細切り、油揚げは短冊切りにする。","鍋に油を熱し、にんじんとひじきを炒める。","水200ml、だしの素、砂糖、醤油、みりん、油揚げを加え、煮汁が少なくなるまで12分ほど煮る。"]},
+{n:"切り干し大根の煮物",g:"和食",s:"通年",t:25,lv:"かんたん",main:["切り干し大根","にんじん"],c:"乾物のうまみがしみた、懐かしい作り置きおかずです。",bento:1,
+ ing:[["切り干し大根","30g"],["にんじん","1/3本"],["油揚げ","1枚"],["醤油","大さじ2"],["みりん","大さじ1"],["砂糖","大さじ1"],["だしの素","小さじ1"],["サラダ油","小さじ1"]],
+ steps:["切り干し大根は水で戻して絞り、食べやすく切る。にんじんは細切り、油揚げは短冊切りにする。","鍋に油を熱し、切り干し大根とにんじんを炒める。","戻し汁150ml、だしの素、砂糖、醤油、みりん、油揚げを加え、15分ほど煮る。"]},
+{n:"厚揚げの照り焼き",g:"和食",s:"通年",t:10,lv:"かんたん",main:["厚揚げ"],c:"甘辛だれがからんだ、ボリュームのある節約おかずです。",bento:1,
+ ing:[["厚揚げ","1枚（200g）"],["醤油","大さじ1と1/2"],["みりん","大さじ1と1/2"],["砂糖","大さじ1"],["白ごま","小さじ1"],["サラダ油","小さじ1"]],
+ steps:["厚揚げは熱湯をかけて油抜きし、一口大に切る。","フライパンに油を熱し、厚揚げを両面こんがり焼く。","醤油、みりん、砂糖を加えて煮からめ、白ごまをふる。"]},
+{n:"豚こまボールの照り焼き",g:"和食",s:"通年",t:15,lv:"かんたん",main:["豚肉"],c:"豚こまを丸めるだけの簡単ミートボール。作り置きにも。",bento:1,
+ ing:[["豚肉","250g"],["片栗粉","大さじ1"],["醤油","大さじ2"],["みりん","大さじ2"],["砂糖","大さじ1"],["サラダ油","大さじ1"]],
+ steps:["豚肉に片栗粉をもみ込み、一口大に丸める。","フライパンに油を熱し、転がしながら全体に焼き色をつける。","醤油、みりん、砂糖を加えて煮からめ、照りを出す。"]}
+
 ];
+
+/* ===== お弁当タグ（既存レシピは名前リストで指定。新規分は bento:1 を直接付与） ===== */
+var BENTO_NAMES = ["鶏肉の照り焼き", "豚肉のしょうが焼き", "さばの竜田揚げ風焼き", "だし巻き卵", "きんぴらごぼう", "さばの塩焼き風", "鮭の照り焼き風", "さばの照り焼き風", "鮭のバター醤油焼き風", "鶏肉の味噌漬け焼き風", "豆腐ハンバーグ和風", "ひき肉とキャベツのつくね焼き風", "豚肉のねぎ塩焼き風", "ピーマンと豆腐のつくね焼き", "ひき肉と豆腐のつくね焼き", "豚肉の唐揚げ風甘辛だれ", "ほうれん草のおひたし", "にんじんの白ごま和え", "かぼちゃのごま和え", "ピーマンのごま味噌炒め", "なすと豚肉の味噌炒め", "鮭と野菜の味噌炒め", "豚肉と玉ねぎのバター醤油焼き", "じゃがいもとひき肉のカレーきんぴら", "肉じゃが", "里芋の煮っころがし", "肉団子の甘酢あん", "シュウマイ風", "ピーマンと豚肉の細切り炒め", "牛肉とピーマンのオイスター炒め", "豚肉とキャベツの中華味噌炒め", "鶏肉とピーマンの甘酢炒め", "ハンバーグ", "チーズハンバーグ", "おろしハンバーグ", "コロッケ", "ピーマンの肉詰め焼き", "鮭のムニエル", "鶏肉のピカタ", "豚肉のチーズピカタ", "鮭のフライ風", "鶏肉のフライ風", "ウインナーとピーマンのケチャップ炒め", "ほうれん草とチーズのオムレツ", "スパニッシュオムレツ", "ミートボールのトマト煮", "豚肉のピカタ", "鶏肉のミラノ風カツレツ", "野菜のフリッタータ", "ほうれん草と卵のチーズフリッタータ", "ほうれん草のナムル", "もやしのナムル", "にんじんのナムル", "ごぼうの韓国風きんぴら", "キムチとチーズの卵焼き", "プルコギ風炒め", "タイ風卵焼き", "豚肉のタイ風グリル"];
+RECIPES.forEach(function(r){ if(BENTO_NAMES.indexOf(r.n) >= 0) r.bento = 1; });
 
 /* ===== 状態 ===== */
 var LS_KEY = "konbanOkazuV1";
@@ -4241,6 +4305,34 @@ function renderOyatsu(){
         (miss===0 ? '冷蔵庫の食材で作れます' : '足りない食材 ' + miss + ' 点（冷蔵庫基準）') + '</span></div>' +
     '</div>';
   document.getElementById("oyatsuCard").onclick = function(){ openDetail(r, state.fridge.slice(), "home"); };
+}
+/* ===== 今日のお弁当 ===== */
+function bentoRecipe(){
+  var pool = RECIPES.filter(function(r){ return !!r.bento; });
+  if(!pool.length) return null;
+  var sn = seasonNow();
+  var pref = pool.filter(function(r){ return r.s===sn || r.s==="通年"; });
+  if(pref.length >= 20) pool = pref;
+  var now = new Date();
+  var start = new Date(now.getFullYear(),0,0);
+  var doy = Math.floor((now - start)/86400000);
+  return pool[(doy * 3 + 1) % pool.length];
+}
+function renderBento(){
+  var box = document.getElementById("bentoBox");
+  if(!box) return;
+  var r = bentoRecipe();
+  if(!r) return;
+  var miss = missingOf(r, state.fridge).length;
+  box.innerHTML =
+    '<div class="hero" id="bentoCard">' +
+      '<span class="tag">今日のお弁当・' + esc(r.g) + '</span>' +
+      '<div class="name">' + esc(r.n) + '</div>' +
+      '<div class="cm">' + esc(r.c) + '</div>' +
+      '<div class="meta"><span>⏱ 約' + r.t + '分</span><span>難易度：' + esc(r.lv) + '</span><span>' +
+        (miss===0 ? '冷蔵庫の食材で作れます' : '足りない食材 ' + miss + ' 点（冷蔵庫基準）') + '</span></div>' +
+    '</div>';
+  document.getElementById("bentoCard").onclick = function(){ openDetail(r, state.fridge.slice(), "home"); };
 }
 /* ===== 火加減 ===== */
 function heatOfStep(s){
@@ -5470,6 +5562,7 @@ function renderHome(){
   renderHero();
   renderBest();
   renderOyatsu();
+  renderBento();
   renderTasks();
   renderCorners();
   renderChipGroups("chipBox", state.selected, "on", function(item){
@@ -5494,6 +5587,7 @@ function recipeCard(r, have){
     '<div class="name">' + esc(r.n) + '</div>' +
     '<div class="badges"><span class="badge genre">' + esc(r.g) + '</span>' +
     (r.cat ? '<span class="badge season">' + esc(r.cat) + '</span>' : '') +
+    (r.bento ? '<span class="badge season">🍱お弁当</span>' : '') +
     '<span class="badge season">' + esc(r.s) + '</span>' + missHtml + '</div>' +
     '<div class="meta"><span>⏱ 約' + r.t + '分</span><span>難易度：' + esc(r.lv) + '</span></div>' +
     '<div class="ing">主な食材：' + r.main.map(esc).join("・") + '</div>' +
@@ -5522,9 +5616,14 @@ function showResult(title, condText, list, have, from){
   }
   showView("result", true);
 }
+function genreMatch(r){
+  if(state.genre==="指定なし") return true;
+  if(state.genre==="お弁当") return !!r.bento;
+  return r.g===state.genre;
+}
 function doSearch(){
   var have = state.selected.slice();
-  var pool = RECIPES.filter(function(r){ return state.genre==="指定なし" || r.g===state.genre; });
+  var pool = RECIPES.filter(genreMatch);
   if(state.genre==="スイーツ" && state.sweetCat && state.sweetCat!=="指定なし"){
     pool = pool.filter(function(r){ return r.cat===state.sweetCat; });
   }
@@ -5546,7 +5645,7 @@ function orderHitsFirst(list, have){
 }
 function doQuickSearch(){
   var have = state.selected.slice();
-  var pool = RECIPES.filter(function(r){ return r.t <= 15 && (state.genre==="スイーツ" || r.g!=="スイーツ") && (state.genre==="指定なし" || r.g===state.genre); });
+  var pool = RECIPES.filter(function(r){ return r.t <= 15 && genreMatch(r) && (state.genre==="スイーツ" || state.genre==="お弁当" || r.g!=="スイーツ"); });
   var list = orderHitsFirst(sortByRecommend(pool, have), have);
   var cond = "15分以内で作れるレシピ／選んだ食材：" + (have.length ? have.join("・") : "なし") + "／ジャンル：" + state.genre + "／" + list.length + "件";
   showResult("⏱ 時短レシピ（15分以内）", cond, list, have, "home");
@@ -5554,10 +5653,17 @@ function doQuickSearch(){
 function doSeasonSearch(){
   var sn = seasonNow();
   var have = state.selected.slice();
-  var pool = RECIPES.filter(function(r){ return r.s===sn && (state.genre==="スイーツ" || r.g!=="スイーツ") && (state.genre==="指定なし" || r.g===state.genre); });
+  var pool = RECIPES.filter(function(r){ return r.s===sn && genreMatch(r) && (state.genre==="スイーツ" || state.genre==="お弁当" || r.g!=="スイーツ"); });
   var list = orderHitsFirst(sortByRecommend(pool, have), have);
   var cond = sn + "が旬のレシピ／選んだ食材：" + (have.length ? have.join("・") : "なし") + "／ジャンル：" + state.genre + "／" + list.length + "件";
   showResult("🍂 " + sn + "のおすすめ", cond, list, have, "home");
+}
+function doBentoSearch(){
+  var have = state.selected.slice();
+  var pool = RECIPES.filter(function(r){ return !!r.bento; });
+  var list = orderHitsFirst(sortByRecommend(pool, have), have);
+  var cond = "冷めてもおいしい・詰めやすいお弁当向きレシピ／選んだ食材：" + (have.length ? have.join("・") : "なし") + "／" + list.length + "件";
+  showResult("🍱 お弁当レシピ", cond, list, have, "home");
 }
 function renderCorners(){
   var sn = seasonNow();
@@ -5565,6 +5671,8 @@ function renderCorners(){
   document.getElementById("quickCount").textContent = "15分以内・" + RECIPES.filter(function(r){ return r.t<=15 && r.g!=="スイーツ"; }).length + "品";
 
   document.getElementById("seasonCount").textContent = sn + "の料理・" + RECIPES.filter(function(r){ return r.s===sn && r.g!=="スイーツ"; }).length + "品";
+  var bc = document.getElementById("bentoCount");
+  if(bc) bc.textContent = "冷めてもおいしい・" + RECIPES.filter(function(r){ return !!r.bento; }).length + "品";
 }
 function doFridgeSearch(){
   var have = state.fridge.slice();
@@ -6485,6 +6593,7 @@ function boot(){
   document.getElementById("searchBtn").onclick = doSearch;
   document.getElementById("quickBtn").onclick = doQuickSearch;
   document.getElementById("seasonBtn").onclick = doSeasonSearch;
+  document.getElementById("bentoBtn").onclick = doBentoSearch;
   document.getElementById("fridgeSearchBtn").onclick = doFridgeSearch;
   document.getElementById("fridgeCheckBtn").onclick = function(){
     var el = document.getElementById("fridgeStock");
