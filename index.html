@@ -33,6 +33,7 @@ header{
 }
 header .ttl{font-size:24px; font-weight:800; letter-spacing:.02em;}
 header .ttl .em{color:var(--acc);}
+header .ttl .zhName{font-size:16px; color:#A9713B;}
 header .sub{font-size:15px; color:var(--sub); margin-top:2px;}
 main{flex:1 1 auto; width:100%; max-width:640px; margin:0 auto; padding:14px 14px 28px; overflow-y:auto; -webkit-overflow-scrolling:touch;}
 .view{display:none;}
@@ -282,6 +283,7 @@ body::after{ content:""; position:fixed; top:0; left:0; right:0; bottom:calc(78p
 .catChip{ display:inline-block; font-size:11.5px; font-weight:800; padding:2px 9px; border-radius:999px; color:#fff; }
 .readBadge{ font-size:11.5px; font-weight:800; padding:2px 8px; border-radius:999px; background:#e8f6e9; color:#2e7d32; }
 .unreadBadge{ font-size:11.5px; font-weight:800; padding:2px 8px; border-radius:999px; background:#fff3e0; color:#e65100; }
+.twBadge{ font-size:11.5px; font-weight:800; padding:2px 8px; border-radius:999px; background:#fde7f0; color:#c2185b; }
 .bookCard{ background:linear-gradient(160deg,rgba(255,253,247,.62),rgba(255,241,222,.62)); }
 .readerBody{ font-size:17.5px; line-height:1.95; background:#fffdf8; border:1.5px solid #f0e2cf; border-radius:14px; padding:22px 18px; min-height:320px; box-shadow:inset 0 0 24px rgba(214,164,90,.10); }
 .readerBody p{ margin:0 0 1em; }
@@ -328,7 +330,7 @@ body.panelBeige #mascotBubble::after{ background:#FFF3D6; }
 </head>
 <body>
 <header>
-  <div class="ttl">🍳 パパッと<span class="em">Cook</span></div>
+  <div class="ttl">🍳 パパッと<span class="em">Cook</span><span class="zhName" id="appNameZh" style="display:none;">｜今晚煮什麼</span></div>
   <div class="sub">持っている食材から、今夜の一品を決めるお手伝い</div>
 </header>
 <main>
@@ -4966,7 +4968,7 @@ function renderStory(){
   var lead = pages0[0].split("\n\n")[0];
   if(lead.length > 95) lead = lead.slice(0, 95) + "…";
   box.innerHTML = '<div><span class="catChip" style="background:' + catColor(st0.cat) + ';">' + esc(st0.cat) + "</span> " +
-    '<span class="note">' + esc(st0.d) + "</span> " + (storyIsRead(storyCur) ? '<span class="readBadge">✓ 読了</span>' : '<span class="unreadBadge">未読</span>') + "</div>" +
+    '<span class="note">' + esc(st0.d) + "</span> " + (storyIsRead(storyCur) ? '<span class="readBadge">✓ 読了</span>' : '<span class="unreadBadge">未読</span>') + (st0.badge ? ' <span class="twBadge">' + esc(st0.badge) + "</span>" : "") + "</div>" +
     '<div style="font-weight:800; font-size:19px; margin:8px 0 6px;">' + esc(st0.t) + "</div>" +
     "<p style=\"margin:0 0 4px;\">" + esc(lead) + "</p>" +
     '<div class="note">全' + pages0.length + 'ページの読み物です</div>' +
@@ -4989,7 +4991,7 @@ function renderStory(){
     shown++;
     var card = document.createElement("div");
     card.className = "storyCard";
-    card.innerHTML = '<div><span class="catChip" style="background:' + catColor(st.cat) + ';">' + esc(st.cat) + "</span> " + (storyIsRead(i) ? '<span class="readBadge">✓ 読了</span>' : '<span class="unreadBadge">未読</span>') + "</div>" +
+    card.innerHTML = '<div><span class="catChip" style="background:' + catColor(st.cat) + ';">' + esc(st.cat) + "</span> " + (storyIsRead(i) ? '<span class="readBadge">✓ 読了</span>' : '<span class="unreadBadge">未読</span>') + (st.badge ? ' <span class="twBadge">' + esc(st.badge) + "</span>" : "") + "</div>" +
       '<div class="ttl">' + esc(st.t) + "</div>" +
       '<div class="note">' + esc(st.d) + "／全" + storyPages(st).length + "ページ</div>";
     card.onclick = (function(idx){ return function(){ openReader(idx); }; })(i);
@@ -7322,6 +7324,11 @@ function updateLangBtns(){
     b.style.fontWeight = on ? "800" : "";
   });
 }
+/* ヘッダータイトルの中国語名併記は zh モードの時だけ表示する */
+function updateAppTitle(){
+  var el = document.getElementById("appNameZh");
+  if(el) el.style.display = (cur === "zh") ? "" : "none";
+}
 function setLang(l){
   if(l !== "ja" && l !== "zh") return;
   cur = l;
@@ -7336,6 +7343,7 @@ function setLang(l){
     document.documentElement.lang = "ja";
   }
   updateLangBtns();
+  updateAppTitle();
 }
 window.PAPATTO_I18N = { setLang: setLang, getLang: function(){ return cur; }, ingToZh: trIng, toJa: zhToJa, tr: trText };
 
@@ -7348,6 +7356,7 @@ if(cur === "zh"){
   startObserver();
 }
 updateLangBtns();
+updateAppTitle();
 })();
 </script>
 
