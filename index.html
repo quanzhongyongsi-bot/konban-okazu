@@ -627,8 +627,10 @@ body.panelBeige #mascotBubble::after{ background:#FFF3D6; }
     </div>
     <div class="card planCard">
       <div class="t" style="font-weight:800; font-size:17px;">現在のプラン</div>
-      <div class="price">無料プラン</div>
+      <div class="price" id="planPrice">無料プラン</div>
       <div class="note">使い始めてから30日間は、すべての機能を無料でお使いいただけます。31日目からは一部の機能（プレミアム）が有料になります（月額450円・税込を予定）。<br>お支払いは、その時期が来たらこの画面に表示されるボタンから、Stripeの安全な決済画面で行えます。カード番号をこのアプリが保存することはありません。レシピ検索などの基本機能は、31日目以降も無料のままです。文字数やポイントでの追加料金はなく、知らないうちに課金されることもありません。</div>
+      <div class="note" id="planStatus" style="margin-top:8px; font-weight:700;"></div>
+      <div id="planAction" style="margin-top:10px;"></div>
     </div>
     <div class="card">
       <div style="font-weight:800; font-size:17px; margin-bottom:6px;">常備品について</div>
@@ -669,6 +671,16 @@ body.panelBeige #mascotBubble::after{ background:#FFF3D6; }
     <div class="row">
       <button class="ng" id="modalCancel">やめる</button>
       <button class="ok" id="modalOk">OK</button>
+    </div>
+  </div>
+</div>
+<div class="modalBg" id="premiumBg">
+  <div class="modal">
+    <div style="font-weight:800; font-size:17px; margin-bottom:8px;">🔒 プレミアム機能です</div>
+    <div id="premiumText"></div>
+    <div class="row">
+      <button class="ng" id="premiumLater">あとで</button>
+      <button class="ok" id="premiumGo">月額450円で続ける</button>
     </div>
   </div>
 </div>
@@ -4123,6 +4135,130 @@ function fmtQty(name){ return fmtQtyOf(state.fridgeQty, name); }
 function fmtQtyIn(name){ return fmtQtyOf(state.fridgeInQty, name); }
 function saveState(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
 
+/* ===== 課金（方式B: 初回30日間は全機能無料、31日目からプレミアムロック） =====
+   - 課金状態は専用キー "papattoBillingV1" に保存する（konbanOkazuV1 は変更しない）。
+   - 判定はこの端末のブラウザ内記録だけで行う。サーバーを持たない方式の限界として、
+     ブラウザの記録を消したり別の端末で開いたりすると、支払い状態は引き継がれない。
+   - 支払いは Stripe の支払いリンクへ誘導する。支払い完了後の戻り先URLは
+     アプリURL + "?billing=success" に設定し、戻りを検知したら解放する。 */
+var BILLING_KEY = "papattoBillingV1";
+var BILLING_FREE_DAYS = 30;            /* 無料期間（日）。初回利用日を1日目とする */
+var BILLING_FRIDGE_FREE_PER_DAY = 1;   /* 無料期間終了後、冷蔵庫検索の1日あたり無料回数 */
+var BILLING_LINK_JPY = "https://buy.stripe.com/9B600keZh4MD5Zmdz50gw01"; /* Stripe本番リンク（JPY 450円/月、2026-11-23作成） */
+var BILLING_LINK_TWD = "https://buy.stripe.com/3cI14o18rdj99byeD90gw02";             /* 台湾向けリンク（TWD NT$99/月、2026-11-23作成） */
+var BILLING_FEATURE_NAMES = {
+  ai: "AIレシピ生成",
+  fridge: "冷蔵庫の残り物モード",
+  narration: "調理モードの読み上げ"
+};
+function billingLoad(){
+  var b = null;
+  try{ b = JSON.parse(localStorage.getItem(BILLING_KEY) || "null"); }catch(e){}
+  if(!b || typeof b !== "object") b = {};
+  if(typeof b.first !== "string") b.first = null;
+  if(b.premium !== true) b.premium = false;
+  if(!b.fridge || typeof b.fridge !== "object") b.fridge = {};
+  return b;
+}
+function billingSave(b){ try{ localStorage.setItem(BILLING_KEY, JSON.stringify(b)); }catch(e){} }
+function billingDayDiff(firstKey){
+  function num(k){ var p = k.split("-"); return Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000; }
+  return num(dateKey(new Date())) - num(firstKey);
+}
+function billingInit(){
+  var b = billingLoad();
+  var changed = false;
+  if(!b.first){ b.first = dateKey(new Date()); changed = true; }
+  try{
+    var qs = new URLSearchParams(window.location.search);
+    if(qs.get("billing") === "success" && !b.premium){
+      b.premium = true; b.premiumAt = dateKey(new Date()); changed = true;
+      qs.delete("billing");
+      var q = qs.toString();
+      window.history.replaceState(null, "", window.location.pathname + (q ? "?" + q : "") + window.location.hash);
+      setTimeout(function(){ toast("プレミアムが有効になりました。ありがとうございます。"); }, 600);
+    }
+  }catch(e){}
+  if(changed) billingSave(b);
+}
+function premiumActive(){
+  var b = billingLoad();
+  if(b.premium) return true;
+  if(!b.first) return true;
+  return billingDayDiff(b.first) < BILLING_FREE_DAYS;
+}
+function trialDaysLeft(){
+  var b = billingLoad();
+  if(!b.first) return BILLING_FREE_DAYS;
+  var left = BILLING_FREE_DAYS - billingDayDiff(b.first);
+  return left > 0 ? left : 0;
+}
+function billingLink(){
+  var lang = (window.PAPATTO_I18N && PAPATTO_I18N.getLang) ? PAPATTO_I18N.getLang() : "ja";
+  if(lang === "zh" && BILLING_LINK_TWD) return BILLING_LINK_TWD;
+  return BILLING_LINK_JPY;
+}
+function showPremiumLock(featureKey){
+  var name = BILLING_FEATURE_NAMES[featureKey] || "この機能";
+  var t = document.getElementById("premiumText");
+  if(t) t.textContent = "「" + name + "」は、無料期間の終了後はプレミアム（月額450円）で使える機能です。基本のレシピ検索などは、これからも無料で使えます。";
+  var bg = document.getElementById("premiumBg");
+  if(bg) bg.classList.add("show");
+}
+function hidePremiumLock(){
+  var bg = document.getElementById("premiumBg");
+  if(bg) bg.classList.remove("show");
+}
+/* 汎用ゲート: AIレシピ生成など、今後追加するプレミアム機能は premiumGate("ai") の形で判定する */
+function premiumGate(featureKey){
+  if(premiumActive()) return true;
+  showPremiumLock(featureKey);
+  return false;
+}
+/* 冷蔵庫の残り物モード: 無料期間終了後は1日 BILLING_FRIDGE_FREE_PER_DAY 回まで無料、それ以上はロック */
+function fridgeGate(){
+  if(premiumActive()) return true;
+  var b = billingLoad();
+  var k = dateKey(new Date());
+  var used = b.fridge[k] || 0;
+  if(used < BILLING_FRIDGE_FREE_PER_DAY){
+    b.fridge[k] = used + 1; billingSave(b); return true;
+  }
+  showPremiumLock("fridge");
+  return false;
+}
+/* 調理モードの読み上げ: 手動で押したときだけロック画面を出す（自動読み上げは静かに止める） */
+function narrationGate(manual){
+  if(premiumActive()) return true;
+  if(manual) showPremiumLock("narration");
+  return false;
+}
+function renderPlan(){
+  var price = document.getElementById("planPrice");
+  var st = document.getElementById("planStatus");
+  var act = document.getElementById("planAction");
+  if(!price || !st || !act) return;
+  var b = billingLoad();
+  act.innerHTML = "";
+  if(b.premium){
+    price.textContent = "プレミアムプラン";
+    st.textContent = "プレミアムが有効です。すべての機能が使えます。";
+    return;
+  }
+  price.textContent = "無料プラン";
+  if(premiumActive()){
+    st.textContent = "無料期間はあと" + trialDaysLeft() + "日です。すべての機能が使えます。";
+  } else {
+    st.textContent = "無料期間（30日間）は終了しました。一部の機能はプレミアムで使えます。";
+    var btn = document.createElement("button");
+    btn.className = "bigbtn green";
+    btn.style.margin = "0";
+    btn.textContent = "月額450円で続ける";
+    btn.onclick = function(){ window.location.href = billingLink(); };
+    act.appendChild(btn);
+  }
+}
+
 /* ===== ユーティリティ ===== */
 function seasonNow(){
   var m = new Date().getMonth()+1;
@@ -4196,6 +4332,7 @@ function showView(name, push){
   if(typeof mascotForView === "function") mascotForView(name);
   if(typeof noteView === "function") noteView(name);
   if(name === "settings" && typeof renderBgChoices === "function") renderBgChoices();
+  if(name === "settings" && typeof renderPlan === "function") renderPlan();
   if(name === "settings" && typeof renderPanelStyles === "function") renderPanelStyles();
   var mainEl = document.querySelector("main");
   if(mainEl) mainEl.scrollTop = 0;
@@ -5692,6 +5829,7 @@ function renderCorners(){
   if(bc) bc.textContent = "冷めてもおいしい・" + RECIPES.filter(function(r){ return !!r.bento; }).length + "品";
 }
 function doFridgeSearch(){
+  if(!fridgeGate()) return;
   var have = state.fridge.slice();
   var list = RECIPES.filter(function(r){ return missingOf(r, have).length===0; });
   list = sortByRecommend(list, have);
@@ -5883,8 +6021,9 @@ function renderCookPrep(){
   db.innerHTML = '<button class="bigbtn" id="cookStartBtn" style="margin-top:14px;">▶ 調理スタート</button>';
   document.getElementById("cookStartBtn").onclick = function(){ if(!cookState) return; cookState.phase = "steps"; cookState.idx = 0; renderCookStep(true); };
 }
-function cookSpeakPrep(){
+function cookSpeakPrep(manual){
   if(!cookState) return;
+  if(!narrationGate(manual)) return;
   var r = cookState.r, d = cookPrepData(r);
   var t = "まず準備をしましょう。";
   if(d.foods.length) t += "材料は、" + d.foods.map(function(pr){ return pr[0]; }).join("、") + "です。";
@@ -5912,9 +6051,10 @@ function finishCookOnly(){
   goBack();
   toast("完成です。お疲れさまでした（記録はしていません）");
 }
-function cookSpeakStep(){
+function cookSpeakStep(manual){
   if(!cookState) return;
-  if(cookState.phase === "prep"){ cookSpeakPrep(); return; }
+  if(!narrationGate(manual)) return;
+  if(cookState.phase === "prep"){ cookSpeakPrep(manual); return; }
   var r = cookState.r, i = cookState.idx, s = r.steps[i];
   var pre = "";
   if(i === 0) pre = "調理を始めます。";
@@ -5967,7 +6107,7 @@ function renderCookStep(speak){
   } else db.innerHTML = "";
   if(speak){
     var tg = document.getElementById("cookVoiceTgl");
-    if(tg && tg.checked) cookSpeakStep();
+    if(tg && tg.checked) cookSpeakStep(false);
   }
 }
 function cookPaintTimer(){
@@ -6607,6 +6747,7 @@ function setupVoice(btnId, inputId, guideId){
 
 /* ===== 初期化 ===== */
 function boot(){
+  billingInit();
   loadState();
   applyPanelStyle();
   renderHome();
@@ -6614,6 +6755,9 @@ function boot(){
   renderSaved();
   renderRecord();
   document.getElementById("searchBtn").onclick = doSearch;
+  document.getElementById("premiumLater").onclick = hidePremiumLock;
+  document.getElementById("premiumGo").onclick = function(){ hidePremiumLock(); window.location.href = billingLink(); };
+  document.getElementById("premiumBg").addEventListener("click", function(e){ if(e.target === this) hidePremiumLock(); });
   document.getElementById("quickBtn").onclick = doQuickSearch;
   document.getElementById("seasonBtn").onclick = doSeasonSearch;
   document.getElementById("bentoBtn").onclick = doBentoSearch;
@@ -6703,7 +6847,7 @@ function boot(){
   document.getElementById("cookBack").onclick = function(){ cookExit(); goBack(); };
   document.getElementById("cookPrev").onclick = function(){ if(!cookState) return; cookStopTimer(); if(cookState.phase === "steps" && cookState.idx === 0){ cookState.phase = "prep"; renderCookPrep(); } else if(cookState.idx > 0){ cookState.idx--; renderCookStep(true); } };
   document.getElementById("cookNext").onclick = function(){ if(!cookState || cookState.phase === "prep") return; cookStopTimer(); if(cookState.idx < cookState.r.steps.length - 1){ cookState.idx++; renderCookStep(true); } else { finishCookOnly(); } };
-  document.getElementById("cookSpeak").onclick = function(){ cookSpeakStep(); };
+  document.getElementById("cookSpeak").onclick = function(){ cookSpeakStep(true); };
   document.getElementById("cookStopBtn").onclick = function(){ stopNarration(); };
   document.getElementById("wazaBack").onclick = function(){ goBack(); };
   document.getElementById("storageBtn").onclick = function(){
@@ -6905,6 +7049,12 @@ var ZH = {
   "🔒 プライバシーについて":"🔒 關於隱私",
   "入力した情報は、この端末の中だけに保存されます。外部に送信されることはありません。第三者があなたの情報を見ることは一切ありません。":"輸入的資訊只會儲存在這台裝置中，不會傳送到外部。第三者絕對無法查看您的資訊。",
   "現在のプラン":"目前方案","無料プラン":"免費方案",
+  "プレミアムプラン":"Premium 方案","月額450円で続ける":"以每月 450 日圓繼續使用","あとで":"稍後",
+  "🔒 プレミアム機能です":"🔒 這是 Premium 功能",
+  "AIレシピ生成":"AI 食譜生成","冷蔵庫の残り物モード":"冰箱剩菜模式","調理モードの読み上げ":"烹飪模式朗讀",
+  "プレミアムが有効です。すべての機能が使えます。":"Premium 已啟用。所有功能都可以使用。",
+  "無料期間（30日間）は終了しました。一部の機能はプレミアムで使えます。":"免費期間（30 天）已結束。部分功能需要 Premium 才能使用。",
+  "プレミアムが有効になりました。ありがとうございます。":"Premium 已啟用。謝謝您的支持。",
   "使い始めてから30日間は、すべての機能を無料でお使いいただけます。31日目からは一部の機能（プレミアム）が有料になります（月額450円・税込を予定）。":"開始使用後的 30 天內，所有功能皆可免費使用。第 31 天起，部分功能（進階版）將收費（預計每月 450 日圓・含稅）。",
   "お支払いは、その時期が来たらこの画面に表示されるボタンから、Stripeの安全な決済画面で行えます。カード番号をこのアプリが保存することはありません。レシピ検索などの基本機能は、31日目以降も無料のままです。文字数やポイントでの追加料金はなく、知らないうちに課金されることもありません。":"付款時，可由此畫面顯示的按鈕前往 Stripe 的安全付款頁面進行。本 App 不會儲存您的卡號。食譜搜尋等基本功能在第 31 天後仍維持免費。沒有依字數或點數的額外收費，也不會在不知情的情況下扣款。",
   "常備品について":"關於常備調味料",
@@ -7158,6 +7308,8 @@ function durZh(s){ return s.replace(/時間/g,"小時").replace(/分/g,"分鐘")
 /* 複合文字列（数値や単語を含む動的文）の翻訳。翻訳できなければ null。 */
 function trComposite(core){
   var m;
+  if(m = core.match(/^無料期間はあと(\d+)日です。すべての機能が使えます。$/)) return "免費期間還剩 " + m[1] + " 天。所有功能都可以使用。";
+  if(m = core.match(/^「(.+?)」は、無料期間の終了後はプレミアム（月額450円）で使える機能です。基本のレシピ検索などは、これからも無料で使えます。$/)){ var fn = trText(m[1]); return "「" + (fn || m[1]) + "」是免費期間結束後，需要 Premium（每月 450 日圓）才能使用的功能。基本的食譜搜尋等功能，今後仍可免費使用。"; }
   if(m = core.match(/^⏱ 約(\d+)分$/)) return "⏱ 約 " + m[1] + " 分鐘";
   if(m = core.match(/^約(\d+)分$/)) return "約 " + m[1] + " 分鐘";
   if(m = core.match(/^難易度：(.+)$/)) return "難度：" + trWord(m[1]);
