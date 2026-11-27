@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://quanzhongyongsi-bot.github.io/konban-okazu/sitemap.xml
