@@ -7093,7 +7093,7 @@ if(typeof window !== "undefined" && typeof document !== "undefined"){
    - 言語設定は localStorage の別キー "papattoLang" に保存（konbanOkazuV1 は不変）。 */
 (function(){
 "use strict";
-var LANG_KEY = "papattoLang";
+var LANG_KEY = "papattoLangJp";
 var cur = "ja";
 try{ var saved = localStorage.getItem(LANG_KEY); if(saved === "zh" || saved === "ja") cur = saved; }catch(e){}
 
