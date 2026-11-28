@@ -112,6 +112,10 @@ h2.sec:first-child{margin-top:2px;}
 .badge.zero{background:#E3F2E1; color:#2F7A3E;}
 .rcard .ing{font-size:15px; color:var(--sub);}
 .rcard .cm{font-size:15px; margin-top:4px;}
+.featCatch{font-size:19px; font-weight:800; margin-bottom:4px;}
+.ramenItem{display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:var(--soft); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:8px; cursor:pointer; font-family:inherit; color:var(--ink);}
+.ramenItem .rn{font-size:16px; font-weight:800;}
+.ramenItem .rm{font-size:13px; color:var(--sub); margin-left:auto; white-space:nowrap;}
 .backbar{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
 .backbtn{
   font-size:16px; font-weight:700; background:#fff; border:1.5px solid var(--line);
@@ -404,6 +408,14 @@ body.panelBeige #mascotBubble::after{ background:#FFF3D6; }
     <div id="bentoBox"></div>
     <div class="note">冷めてもおいしくて詰めやすい、お弁当向きのレシピの中から、日替わりで1品おすすめします。</div>
 
+    <h2 class="sec">🍜 特集：おうちラーメン</h2>
+    <div class="card">
+      <div class="featCatch">王道からアレンジまで、おうちラーメン10品</div>
+      <div class="note">お店の味をめざす王道の醤油・味噌・塩から、トマトやカレーのアレンジまで。すべて2人分で、市販の中華麺で作れます。気になる一品をタップすると、材料と作り方が開きます。</div>
+      <div id="ramenBox"></div>
+      <button class="bigbtn" id="ramenAllBtn" style="margin-top:12px;">🍜 10品を一覧で見る</button>
+    </div>
+
     <h2 class="sec">📌 コーナー</h2>
     <div class="cornerRow">
       <button class="cornerBtn" id="quickBtn">⏱ 時短レシピ<span class="cs" id="quickCount"></span></button>
@@ -411,6 +423,9 @@ body.panelBeige #mascotBubble::after{ background:#FFF3D6; }
     </div>
     <div class="cornerRow" style="margin-top:10px;">
       <button class="cornerBtn" id="bentoBtn">🍱 お弁当レシピ<span class="cs" id="bentoCount"></span></button>
+    </div>
+    <div class="cornerRow" style="margin-top:10px;">
+      <button class="cornerBtn" id="ramenBtn">🍜 おうちラーメン特集<span class="cs" id="ramenCount"></span></button>
     </div>
     <div class="cornerRow" style="margin-top:10px;">
       <button class="cornerBtn" id="wazaBtn">✨ 裏技・保存コーナー<span class="cs">美味しくする技と、食材の保存法</span></button>
@@ -718,7 +733,7 @@ body.panelBeige #mascotBubble::after{ background:#FFF3D6; }
 "use strict";
 /* ===== 定数 ===== */
 var STAPLES = ["塩","こしょう","醤油","味噌","砂糖","酒","みりん","サラダ油","ごま油","だしの素","酢","片栗粉"];
-var GENRES = ["指定なし","和食","中華","イタリアン","タイ","洋食","韓国","スイーツ","お弁当"];
+var GENRES = ["指定なし","和食","中華","イタリアン","タイ","洋食","韓国","スイーツ","お弁当","ラーメン"];
 var CHIP_GROUPS = [
   {label:"肉・卵", items:["鶏肉","豚肉","牛肉","ひき肉","卵","ベーコン","ウインナー"]},
   {label:"魚介", items:["鮭","さば","エビ"]},
@@ -3998,7 +4013,39 @@ var RECIPES = [
  steps:["厚揚げは熱湯をかけて油抜きし、一口大に切る。","フライパンに油を熱し、厚揚げを両面こんがり焼く。","醤油、みりん、砂糖を加えて煮からめ、白ごまをふる。"]},
 {n:"豚こまボールの照り焼き",g:"和食",s:"通年",t:15,lv:"かんたん",main:["豚肉"],c:"豚こまを丸めるだけの簡単ミートボール。作り置きにも。",bento:1,
  ing:[["豚肉","250g"],["片栗粉","大さじ1"],["醤油","大さじ2"],["みりん","大さじ2"],["砂糖","大さじ1"],["サラダ油","大さじ1"]],
- steps:["豚肉に片栗粉をもみ込み、一口大に丸める。","フライパンに油を熱し、転がしながら全体に焼き色をつける。","醤油、みりん、砂糖を加えて煮からめ、照りを出す。"]}
+ steps:["豚肉に片栗粉をもみ込み、一口大に丸める。","フライパンに油を熱し、転がしながら全体に焼き色をつける。","醤油、みりん、砂糖を加えて煮からめ、照りを出す。"]},
+
+/* ---------- おうちラーメン特集（新規追加） ---------- */
+{n:"王道の醤油ラーメン",g:"中華",s:"通年",t:20,lv:"ふつう",main:["中華麺","チャーシュー","卵"],c:"鶏ガラベースの澄んだスープに、味玉とチャーシュー。お店の味をめざす王道の一杯です。",ramen:1,
+ ing:[["中華麺（生）","2玉"],["チャーシュー","4枚"],["卵","2個"],["長ねぎ","1/2本"],["メンマ","40g"],["焼きのり","2枚"],["水","800ml"],["鶏ガラスープの素","大さじ2"],["醤油","大さじ3"],["みりん","大さじ1"],["ごま油","小さじ1"]],
+ steps:["卵は沸騰したお湯で7分ゆでて冷水で冷まし、殻をむく。時間に余裕があれば、醤油とみりん（分量外）に漬けて味玉にする。","長ねぎは小口切りにする。鍋に水と鶏ガラスープの素を入れて沸かし、醤油、みりん、ごま油で味を調える。","別の鍋で中華麺を表示時間どおりにゆで、湯を切る。","器にスープを注いで麺を入れ、半分に切った卵、チャーシュー、メンマ、のり、ねぎをのせる。"]},
+{n:"あっさり塩ラーメン",g:"中華",s:"通年",t:15,lv:"かんたん",main:["中華麺","鶏肉","もやし"],c:"鶏のうまみが際立つ、あっさり澄んだ塩味。ゆで鶏ともやしでさっぱり食べられます。",ramen:1,
+ ing:[["中華麺（生）","2玉"],["鶏むね肉","1/2枚"],["もやし","1/2袋"],["青ねぎ","2本"],["白ごま","大さじ1"],["水","800ml"],["鶏ガラスープの素","大さじ2"],["塩","小さじ1"],["ごま油","小さじ2"]],
+ steps:["鍋に水と鶏むね肉を入れて火にかけ、沸いたら弱火で8分ゆでる。鶏肉を取り出して粗熱を取り、手で裂く。ゆで汁はスープに使う。","ゆで汁に鶏ガラスープの素と塩を加えて味を調え、もやしをさっとゆでて取り出す。","別の鍋で中華麺を表示時間どおりにゆで、湯を切る。","器にスープと麺を入れ、鶏肉、もやし、小口切りの青ねぎをのせ、白ごまとごま油を回しかける。"]},
+{n:"コク旨味噌ラーメン",g:"中華",s:"通年",t:20,lv:"ふつう",main:["中華麺","豚ひき肉","コーン"],c:"炒めたひき肉と野菜のうまみが溶け込む、コク深い味噌味。バターとコーンが相性抜群です。",ramen:1,
+ ing:[["中華麺（生）","2玉"],["豚ひき肉","100g"],["もやし","1/2袋"],["コーン缶","1/2缶"],["長ねぎ","1/2本"],["バター","10g"],["水","800ml"],["鶏ガラスープの素","大さじ1"],["味噌","大さじ3"],["醤油","小さじ1"],["すりごま","大さじ1"],["ごま油","大さじ1"]],
+ steps:["フライパンにごま油を熱し、豚ひき肉を炒める。色が変わったらもやしを加えてさっと炒める。","鍋に水と鶏ガラスープの素を沸かし、味噌を溶き入れて醤油とすりごまで味を調える。炒めた具を加える。","別の鍋で中華麺を表示時間どおりにゆで、湯を切る。","器に麺とスープを入れ、コーン、小口切りの長ねぎ、バターをのせる。"]},
+{n:"おうち豚骨風ラーメン",g:"中華",s:"通年",t:25,lv:"ふつう",main:["中華麺","豚肉","牛乳"],c:"牛乳と味噌の合わせ技で、豚骨風の白濁スープに。長時間煮込まなくてもコクが出ます。",ramen:1,
+ ing:[["中華麺（生）","2玉"],["豚バラ薄切り肉","100g"],["牛乳","200ml"],["水","600ml"],["鶏ガラスープの素","大さじ2"],["味噌","大さじ1"],["醤油","小さじ1"],["青ねぎ","2本"],["紅しょうが","適量"],["すりごま","大さじ1"],["ごま油","小さじ2"]],
+ steps:["豚肉は3cm幅に切る。鍋にごま油を熱して豚肉を炒め、水と鶏ガラスープの素を加えて5分煮る。","牛乳を加え、沸騰させないように温めながら味噌を溶き入れ、醤油とすりごまで味を調える。","別の鍋で中華麺を表示時間どおりにゆで、湯を切る。","器に麺とスープを入れ、小口切りの青ねぎと紅しょうがをのせる。"]},
+{n:"ピリ辛担々麺",g:"中華",s:"通年",t:20,lv:"ふつう",main:["中華麺","豚ひき肉","チンゲン菜"],c:"練りごまのコクと豆板醤の辛みがきいた本格派。肉味噌をのせて食べごたえも十分です。",ramen:1,
+ ing:[["中華麺（生）","2玉"],["豚ひき肉","100g"],["チンゲン菜","1株"],["水","700ml"],["鶏ガラスープの素","大さじ2"],["練りごま","大さじ3"],["醤油","大さじ1"],["豆板醤","小さじ1"],["味噌","大さじ1"],["砂糖","小さじ1"],["ラー油","適量"],["ごま油","大さじ1"]],
+ steps:["フライパンにごま油と豆板醤を熱し、豚ひき肉を炒める。味噌と砂糖で味付けして肉味噌にする。","チンゲン菜は縦4等分に切り、さっとゆでる。","鍋に水と鶏ガラスープの素を沸かし、練りごまと醤油を溶き入れる。","別の鍋で中華麺を表示時間どおりにゆで、湯を切る。器にスープと麺を入れ、肉味噌とチンゲン菜をのせ、ラー油を回しかける。"]},
+{n:"濃厚つけ麺",g:"中華",s:"通年",t:20,lv:"ふつう",main:["中華麺","チャーシュー","卵"],c:"かつおの風味をきかせた濃いつけ汁に、冷水でしめた麺。おうちでもつけ麺屋気分です。",ramen:1,
+ ing:[["中華麺（生）","2玉"],["チャーシュー","4枚"],["卵","2個"],["長ねぎ","1/2本"],["水","300ml"],["鶏ガラスープの素","大さじ1"],["醤油","大さじ2"],["オイスターソース","大さじ1"],["砂糖","小さじ1"],["かつお節粉","5g"],["ごま油","小さじ1"]],
+ steps:["卵は沸騰したお湯で7分ゆでて冷水で冷まし、殻をむいて半分に切る。","小鍋に水、鶏ガラスープの素、醤油、オイスターソース、砂糖を入れて温め、かつお節粉とごま油を加えてつけ汁にする。","中華麺を表示時間より少し長めにゆで、冷水で洗ってしっかり水気を切り、器に盛る。","つけ汁に小口切りの長ねぎを入れ、麺にチャーシューと卵を添える。つけ汁が薄まったら、麺のゆで汁を少し足すと味が戻る。"]},
+{n:"香ばし油そば",g:"中華",s:"通年",t:15,lv:"かんたん",main:["中華麺","チャーシュー","卵"],c:"スープなしでタレをからめる汁なし麺。ごま油の香りと半熟卵のまろやかさがクセになります。",ramen:1,
+ ing:[["中華麺（生）","2玉"],["チャーシュー","4枚"],["卵","2個"],["青ねぎ","2本"],["刻みのり","適量"],["醤油","大さじ2"],["オイスターソース","大さじ1"],["ごま油","大さじ2"],["酢","小さじ1"],["砂糖","小さじ1"]],
+ steps:["卵は沸騰したお湯で7分ゆでて冷水で冷まし、殻をむく（半熟卵にする）。","器に醤油、オイスターソース、ごま油、酢、砂糖を混ぜてタレを作る。","中華麺を表示時間どおりにゆで、湯をしっかり切って器に入れ、タレとよく混ぜる。","チャーシュー、半分に切った卵、小口切りの青ねぎ、刻みのりをのせる。お好みでラー油をかけても。"]},
+{n:"トマトチーズラーメン",g:"中華",s:"通年",t:20,lv:"かんたん",main:["中華麺","トマト缶","チーズ"],c:"トマトの酸味とチーズのコクが合う洋風アレンジ。子どもにも人気の食べやすい味です。",ramen:1,
+ ing:[["中華麺（生）","2玉"],["カットトマト缶","1缶"],["ウインナー","4本"],["玉ねぎ","1/2個"],["水","400ml"],["鶏ガラスープの素","大さじ1"],["コンソメ（顆粒）","小さじ1"],["ピザ用チーズ","40g"],["オリーブオイル","大さじ1"],["塩","少々"]],
+ steps:["玉ねぎは薄切りに、ウインナーは斜め切りにする。鍋にオリーブオイルを熱し、玉ねぎとウインナーを炒める。","トマト缶と水、鶏ガラスープの素、コンソメを加えて5分煮る。塩で味を調える。","別の鍋で中華麺を表示時間どおりにゆで、湯を切る。","器に麺とスープを入れ、ピザ用チーズをのせて、余熱で溶かしながら食べる。"]},
+{n:"カレーラーメン",g:"中華",s:"通年",t:20,lv:"かんたん",main:["中華麺","豚肉","玉ねぎ"],c:"カレールウ1かけで作る、とろみのある熱々スープ。残りカレーのリメイクにも使えます。",ramen:1,
+ ing:[["中華麺（生）","2玉"],["豚こま切れ肉","100g"],["玉ねぎ","1/2個"],["にんじん","1/3本"],["じゃがいも","1個"],["水","800ml"],["鶏ガラスープの素","大さじ1"],["カレールウ","1かけ（約20g）"],["醤油","小さじ1"],["サラダ油","大さじ1"]],
+ steps:["玉ねぎは薄切り、にんじんとじゃがいもは薄い短冊切りにする（薄く切ると早く火が通る）。","鍋に油を熱して豚肉と野菜を炒め、水と鶏ガラスープの素を加えて野菜がやわらかくなるまで約8分煮る。","火を弱めてカレールウを溶き入れ、醤油を加えて2分煮る。","別の鍋で中華麺を表示時間どおりにゆで、湯を切る。器に麺を入れ、カレースープをかける。"]},
+{n:"さっぱりサラダラーメン",g:"中華",s:"夏",t:15,lv:"かんたん",main:["中華麺","ハム","きゅうり"],c:"冷たい麺に野菜とハムをのせて、ごまだれで。暑い日にうれしい、冷やし中華風のアレンジです。",ramen:1,
+ ing:[["中華麺（生）","2玉"],["ハム","4枚"],["きゅうり","1本"],["トマト","1個"],["卵","1個"],["練りごま","大さじ2"],["醤油","大さじ2"],["酢","大さじ1"],["砂糖","小さじ2"],["水","大さじ2"]],
+ steps:["卵は薄焼き卵にして細切りにする（錦糸卵）。ハムときゅうりは細切りに、トマトはくし形に切る。","練りごま、醤油、酢、砂糖、水を混ぜてごまだれを作る。","中華麺を表示時間どおりにゆで、冷水で洗って水気をしっかり切る。","器に麺を盛り、ハム、きゅうり、トマト、錦糸卵をのせて、ごまだれをかける。"]}
 
 ];
 
@@ -5767,6 +5814,7 @@ function renderHome(){
   renderBest();
   renderOyatsu();
   renderBento();
+  renderRamenFeature();
   renderTasks();
   renderCorners();
   renderChipGroups("chipBox", state.selected, "on", function(item){
@@ -5792,6 +5840,7 @@ function recipeCard(r, have){
     '<div class="badges"><span class="badge genre">' + esc(r.g) + '</span>' +
     (r.cat ? '<span class="badge season">' + esc(r.cat) + '</span>' : '') +
     (r.bento ? '<span class="badge season">🍱お弁当</span>' : '') +
+    (r.ramen ? '<span class="badge season">🍜ラーメン特集</span>' : '') +
     '<span class="badge season">' + esc(r.s) + '</span>' + missHtml + '</div>' +
     '<div class="meta"><span>⏱ 約' + r.t + '分</span><span>難易度：' + esc(r.lv) + '</span></div>' +
     '<div class="ing">主な食材：' + r.main.map(esc).join("・") + '</div>' +
@@ -5823,6 +5872,7 @@ function showResult(title, condText, list, have, from){
 function genreMatch(r){
   if(state.genre==="指定なし") return true;
   if(state.genre==="お弁当") return !!r.bento;
+  if(state.genre==="ラーメン") return !!r.ramen;
   return r.g===state.genre;
 }
 function doSearch(){
@@ -5869,6 +5919,26 @@ function doBentoSearch(){
   var cond = "冷めてもおいしい・詰めやすいお弁当向きレシピ／選んだ食材：" + (have.length ? have.join("・") : "なし") + "／" + list.length + "件";
   showResult("🍱 お弁当レシピ", cond, list, have, "home");
 }
+function doRamenSearch(){
+  var have = state.selected.slice();
+  var pool = RECIPES.filter(function(r){ return !!r.ramen; });
+  var list = orderHitsFirst(sortByRecommend(pool, have), have);
+  var cond = "王道からアレンジまで、おうちで作れるラーメン特集／選んだ食材：" + (have.length ? have.join("・") : "なし") + "／" + list.length + "件";
+  showResult("🍜 おうちラーメン特集", cond, list, have, "home");
+}
+function renderRamenFeature(){
+  var box = document.getElementById("ramenBox");
+  if(!box) return;
+  var pool = RECIPES.filter(function(r){ return !!r.ramen; });
+  box.innerHTML = "";
+  pool.forEach(function(r){
+    var b = document.createElement("button");
+    b.className = "ramenItem";
+    b.innerHTML = '<span class="rn">' + esc(r.n) + '</span><span class="rm">⏱ 約' + r.t + '分・' + esc(r.lv) + '</span>';
+    b.onclick = function(){ openDetail(r, state.fridge.slice(), "home"); };
+    box.appendChild(b);
+  });
+}
 function renderCorners(){
   var sn = seasonNow();
   document.getElementById("seasonName").textContent = sn + "のおすすめ";
@@ -5877,6 +5947,8 @@ function renderCorners(){
   document.getElementById("seasonCount").textContent = sn + "の料理・" + RECIPES.filter(function(r){ return r.s===sn && r.g!=="スイーツ"; }).length + "品";
   var bc = document.getElementById("bentoCount");
   if(bc) bc.textContent = "冷めてもおいしい・" + RECIPES.filter(function(r){ return !!r.bento; }).length + "品";
+  var rc = document.getElementById("ramenCount");
+  if(rc) rc.textContent = "王道からアレンジまで・" + RECIPES.filter(function(r){ return !!r.ramen; }).length + "品";
 }
 function doFridgeSearch(){
   if(!fridgeGate()) return;
@@ -6811,6 +6883,8 @@ function boot(){
   document.getElementById("quickBtn").onclick = doQuickSearch;
   document.getElementById("seasonBtn").onclick = doSeasonSearch;
   document.getElementById("bentoBtn").onclick = doBentoSearch;
+  document.getElementById("ramenBtn").onclick = doRamenSearch;
+  document.getElementById("ramenAllBtn").onclick = doRamenSearch;
   document.getElementById("fridgeSearchBtn").onclick = doFridgeSearch;
   document.getElementById("fridgeCheckBtn").onclick = function(){
     var el = document.getElementById("fridgeStock");
